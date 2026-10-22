@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#4f46e5">
+  <title>Мои задачи</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 520px;
+      margin: 30px auto;
+      padding: 0 16px;
+      color: #222;
+    }
+
+    h1 { color: #4f46e5; }
+
+    input, button {
+      box-sizing: border-box;
+      padding: 10px;
+      font-size: 16px;
+    }
+
+    #taskInput { width: 65%; }
+
+    li { margin: 12px 0; }
+
+    .completed {
+      text-decoration: line-through;
+      color: gray;
+    }
+  </style>
+</head>
+<body>
+  <h1>Мои задачи</h1>
+
+  <input id="taskInput" type="text" placeholder="Напиши задачу">
+  <button id="addButton" type="button">Добавить</button>
+  <ul id="taskList"></ul>
+
+  <script>
+    const input = document.getElementById("taskInput");
+    const list = document.getElementById("taskList");
+    const saved = JSON.parse(localStorage.getItem("myTasks") || "[]");
+
+    function saveTasks() {
+      localStorage.setItem("myTasks", JSON.stringify(saved));
+    }
+
+    function showTasks() {
+      list.innerHTML = "";
+
+      saved.forEach(function (task, index) {
+        const item = document.createElement("li");
+        const checkbox = document.createElement("input");
+        const text = document.createElement("span");
+        const deleteButton = document.createElement("button");
+
+        checkbox.type = "checkbox";
+        checkbox.checked = task.completed;
+        text.textContent = " " + task.text;
+
+        if (task.completed) text.classList.add("completed");
+
+        checkbox.addEventListener("change", function () {
+          saved[index].completed = checkbox.checked;
+          saveTasks();
+          showTasks();
+        });
+
+        deleteButton.type = "button";
+        deleteButton.textContent = " Удалить";
+        deleteButton.addEventListener("click", function () {
+          saved.splice(index, 1);
+          saveTasks();
+          showTasks();
+        });
+
+        item.append(checkbox, text, deleteButton);
+        list.appendChild(item);
+      });
+    }
+
+    document.getElementById("addButton").addEventListener("click", function () {
+      const taskText = input.value.trim();
+      if (!taskText) return;
+
+      saved.push({ text: taskText, completed: false });
+      saveTasks();
+      showTasks();
+      input.value = "";
+    });
+
+    showTasks();
+  </script>
+</body>
+</html>
